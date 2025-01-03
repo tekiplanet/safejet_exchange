@@ -13,20 +13,31 @@ class CustomBottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    
     return Container(
       height: 100,
       decoration: BoxDecoration(
+        color: isDark 
+            ? SafeJetColors.primaryBackground
+            : SafeJetColors.lightBackground,
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [
-            SafeJetColors.primaryBackground.withOpacity(0.9),
-            SafeJetColors.primaryBackground,
-          ],
+          colors: isDark
+              ? [
+                  SafeJetColors.primaryBackground.withOpacity(0.9),
+                  SafeJetColors.primaryBackground,
+                ]
+              : [
+                  SafeJetColors.lightBackground.withOpacity(0.9),
+                  SafeJetColors.lightBackground,
+                ],
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withOpacity(0.1),
             blurRadius: 20,
             offset: const Offset(0, -5),
           ),
@@ -44,11 +55,11 @@ class CustomBottomNav extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _buildNavItem(0, Icons.candlestick_chart_rounded, Icons.candlestick_chart_rounded, 'Markets'),
-                  _buildNavItem(1, Icons.sync_alt_rounded, Icons.sync_alt_rounded, 'Trade'),
+                  _buildNavItem(0, Icons.candlestick_chart_rounded, Icons.candlestick_chart_rounded, 'Markets', isDark),
+                  _buildNavItem(1, Icons.sync_alt_rounded, Icons.sync_alt_rounded, 'Trade', isDark),
                   const SizedBox(width: 60),
-                  _buildNavItem(3, Icons.account_balance_wallet_rounded, Icons.account_balance_wallet_rounded, 'Wallets'),
-                  _buildNavItem(4, Icons.person_rounded, Icons.person_rounded, 'Profile'),
+                  _buildNavItem(3, Icons.account_balance_wallet_rounded, Icons.account_balance_wallet_rounded, 'Wallets', isDark),
+                  _buildNavItem(4, Icons.person_rounded, Icons.person_rounded, 'Profile', isDark),
                 ],
               ),
             ),
@@ -94,7 +105,7 @@ class CustomBottomNav extends StatelessWidget {
     );
   }
 
-  Widget _buildNavItem(int index, IconData icon, IconData activeIcon, String label) {
+  Widget _buildNavItem(int index, IconData icon, IconData activeIcon, String label, bool isDark) {
     final isSelected = currentIndex == index;
     return Expanded(
       child: GestureDetector(
@@ -107,12 +118,23 @@ class CustomBottomNav extends StatelessWidget {
               duration: const Duration(milliseconds: 200),
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: isSelected ? SafeJetColors.primaryAccent.withOpacity(0.1) : Colors.transparent,
+                color: isSelected 
+                    ? (isDark ? SafeJetColors.primaryAccent.withOpacity(0.1) : SafeJetColors.lightCardBackground)
+                    : Colors.transparent,
                 borderRadius: BorderRadius.circular(12),
+                border: isSelected
+                    ? Border.all(
+                        color: isDark
+                            ? SafeJetColors.primaryAccent.withOpacity(0.2)
+                            : SafeJetColors.lightCardBorder,
+                      )
+                    : null,
               ),
               child: Icon(
                 isSelected ? activeIcon : icon,
-                color: isSelected ? SafeJetColors.secondaryHighlight : Colors.grey[600],
+                color: isSelected 
+                    ? SafeJetColors.secondaryHighlight
+                    : (isDark ? Colors.grey[600] : SafeJetColors.lightTextSecondary),
                 size: 26,
               ),
             ),
@@ -120,7 +142,9 @@ class CustomBottomNav extends StatelessWidget {
             Text(
               label,
               style: TextStyle(
-                color: isSelected ? SafeJetColors.secondaryHighlight : Colors.grey[600],
+                color: isSelected 
+                    ? SafeJetColors.secondaryHighlight
+                    : (isDark ? Colors.grey[600] : SafeJetColors.lightTextSecondary),
                 fontSize: 12,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
               ),

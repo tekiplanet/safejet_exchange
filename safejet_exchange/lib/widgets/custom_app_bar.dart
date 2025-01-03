@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../config/theme/colors.dart';
+import 'package:provider/provider.dart';
+import '../config/theme/theme_provider.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback? onNotificationTap;
@@ -18,10 +20,16 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: SafeJetColors.primaryBackground,
+        color: isDark 
+            ? SafeJetColors.primaryBackground
+            : SafeJetColors.lightBackground,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.1),
@@ -55,12 +63,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                 const SizedBox(width: 12),
                 Text(
                   title ?? 'SafeJet',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 22,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: -0.5,
-                  ),
+                  style: theme.textTheme.headlineMedium,
                 ),
               ],
             ),
@@ -70,11 +73,15 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                   icon: Icons.notifications_rounded,
                   onTap: onNotificationTap,
                   hasNotification: true,
+                  isDark: isDark,
                 ),
                 const SizedBox(width: 12),
                 _buildActionButton(
-                  icon: Icons.dark_mode_rounded,
+                  icon: themeProvider.isDarkMode 
+                    ? Icons.light_mode_rounded 
+                    : Icons.dark_mode_rounded,
                   onTap: onThemeToggle,
+                  isDark: isDark,
                 ),
               ],
             ),
@@ -86,6 +93,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   Widget _buildActionButton({
     required IconData icon,
+    required bool isDark,
     VoidCallback? onTap,
     bool hasNotification = false,
   }) {
@@ -93,12 +101,19 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       children: [
         Container(
           decoration: BoxDecoration(
-            color: SafeJetColors.primaryAccent.withOpacity(0.1),
+            color: isDark 
+                ? SafeJetColors.primaryAccent.withOpacity(0.1)
+                : SafeJetColors.lightCardBackground,
             borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: isDark
+                  ? SafeJetColors.primaryAccent.withOpacity(0.2)
+                  : SafeJetColors.lightCardBorder,
+            ),
           ),
           child: IconButton(
             icon: Icon(icon),
-            color: Colors.white,
+            color: isDark ? Colors.white : SafeJetColors.lightText,
             iconSize: 24,
             onPressed: onTap,
           ),
@@ -110,7 +125,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             child: Container(
               width: 8,
               height: 8,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: SafeJetColors.secondaryHighlight,
                 shape: BoxShape.circle,
               ),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../config/theme/colors.dart';
+import '../../config/theme/theme_provider.dart';
 import '../../widgets/custom_app_bar.dart';
 import '../../widgets/custom_bottom_nav.dart';
 import 'tabs/markets_tab.dart';
@@ -28,6 +30,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    
     return Material(
       child: Scaffold(
         extendBody: true,
@@ -38,17 +42,17 @@ class _HomeScreenState extends State<HomeScreen> {
             // TODO: Show notifications
           },
           onThemeToggle: () {
-            // TODO: Toggle theme
+            themeProvider.toggleTheme();
           },
         ),
-        body: Container(
+        body: DecoratedBox(
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                SafeJetColors.primaryBackground,
-                SafeJetColors.secondaryBackground,
+                themeProvider.backgroundColor,
+                themeProvider.backgroundColor.withOpacity(0.8),
               ],
             ),
           ),

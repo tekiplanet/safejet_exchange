@@ -28,6 +28,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
       body: SingleChildScrollView(
         child: ConstrainedBox(
@@ -39,10 +42,15 @@ class _LoginScreenState extends State<LoginScreen> {
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [
-                  SafeJetColors.primaryBackground,
-                  SafeJetColors.secondaryBackground,
-                ],
+                colors: isDark
+                    ? [
+                        SafeJetColors.darkGradientStart,
+                        SafeJetColors.darkGradientEnd,
+                      ]
+                    : [
+                        SafeJetColors.lightGradientStart,
+                        SafeJetColors.lightGradientEnd,
+                      ],
               ),
             ),
             child: SafeArea(
@@ -61,18 +69,12 @@ class _LoginScreenState extends State<LoginScreen> {
                         children: [
                           Text(
                             'Welcome Back',
-                            style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                              color: SafeJetColors.textHighlight,
-                              fontSize: 36,
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: theme.textTheme.headlineLarge,
                           ),
                           const SizedBox(height: 8),
                           Text(
                             'Sign in to continue',
-                            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                              color: Colors.grey[400],
-                            ),
+                            style: theme.textTheme.bodyLarge,
                           ),
                         ],
                       ),
@@ -90,15 +92,14 @@ class _LoginScreenState extends State<LoginScreen> {
                             _buildTextField(
                               controller: _emailController,
                               label: 'Email',
-                              icon: Icons.email_outlined,
-                              keyboardType: TextInputType.emailAddress,
+                              hint: 'Enter your email',
                             ),
                             const SizedBox(height: 20),
                             // Password Field
                             _buildTextField(
                               controller: _passwordController,
                               label: 'Password',
-                              icon: Icons.lock_outline,
+                              hint: 'Enter your password',
                               isPassword: true,
                             ),
                             const SizedBox(height: 12),
@@ -185,57 +186,60 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget _buildTextField({
     required TextEditingController controller,
     required String label,
-    required IconData icon,
+    required String hint,
     bool isPassword = false,
-    TextInputType? keyboardType,
   }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: SafeJetColors.primaryAccent.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: SafeJetColors.primaryAccent.withOpacity(0.2),
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: theme.textTheme.bodyLarge,
         ),
-      ),
-      child: TextFormField(
-        controller: controller,
-        obscureText: isPassword && !_isPasswordVisible,
-        keyboardType: keyboardType,
-        style: const TextStyle(color: Colors.white),
-        decoration: InputDecoration(
-          labelText: label,
-          labelStyle: TextStyle(
-            color: Colors.grey[400],
+        const SizedBox(height: 8),
+        Container(
+          decoration: BoxDecoration(
+            color: isDark
+                ? SafeJetColors.primaryAccent.withOpacity(0.1)
+                : SafeJetColors.lightCardBackground,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: isDark
+                  ? SafeJetColors.primaryAccent.withOpacity(0.2)
+                  : SafeJetColors.lightCardBorder,
+            ),
           ),
-          prefixIcon: Icon(
-            icon,
-            color: SafeJetColors.secondaryHighlight,
+          child: TextFormField(
+            controller: controller,
+            obscureText: isPassword && !_isPasswordVisible,
+            style: theme.textTheme.bodyLarge,
+            decoration: InputDecoration(
+              hintText: hint,
+              hintStyle: theme.textTheme.bodyMedium,
+              border: InputBorder.none,
+              contentPadding: const EdgeInsets.all(16),
+              suffixIcon: isPassword
+                  ? IconButton(
+                      icon: Icon(
+                        _isPasswordVisible
+                            ? Icons.visibility_outlined
+                            : Icons.visibility_off_outlined,
+                        color: isDark ? Colors.white70 : Colors.grey,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _isPasswordVisible = !_isPasswordVisible;
+                        });
+                      },
+                    )
+                  : null,
+            ),
           ),
-          suffixIcon: isPassword
-              ? IconButton(
-                  icon: Icon(
-                    _isPasswordVisible
-                        ? Icons.visibility_outlined
-                        : Icons.visibility_off_outlined,
-                    color: SafeJetColors.secondaryHighlight,
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      _isPasswordVisible = !_isPasswordVisible;
-                    });
-                  },
-                )
-              : null,
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.all(16),
         ),
-        validator: (value) {
-          if (value == null || value.isEmpty) {
-            return 'This field is required';
-          }
-          return null;
-        },
-      ),
+      ],
     );
   }
 
