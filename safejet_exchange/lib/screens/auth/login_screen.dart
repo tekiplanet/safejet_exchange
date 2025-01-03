@@ -145,31 +145,23 @@ class _LoginScreenState extends State<LoginScreen> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
-                                Expanded(
-                                  child: _buildSocialButton(
-                                    icon: Icons.g_mobiledata_rounded,
-                                    onPressed: () {
-                                      // TODO: Implement Google login
-                                    },
-                                  ),
+                                _buildSocialButton(
+                                  icon: Icons.g_mobiledata_rounded,
+                                  onPressed: () {
+                                    // TODO: Implement Google login
+                                  },
                                 ),
-                                const SizedBox(width: 16),
-                                Expanded(
-                                  child: _buildSocialButton(
-                                    icon: Icons.apple_rounded,
-                                    onPressed: () {
-                                      // TODO: Implement Apple login
-                                    },
-                                  ),
+                                _buildSocialButton(
+                                  icon: Icons.apple_rounded,
+                                  onPressed: () {
+                                    // TODO: Implement Apple login
+                                  },
                                 ),
-                                const SizedBox(width: 16),
-                                Expanded(
-                                  child: _buildSocialButton(
-                                    icon: Icons.facebook_rounded,
-                                    onPressed: () {
-                                      // TODO: Implement Facebook login
-                                    },
-                                  ),
+                                _buildSocialButton(
+                                  icon: Icons.facebook_rounded,
+                                  onPressed: () {
+                                    // TODO: Implement Facebook login
+                                  },
                                 ),
                               ],
                             ),
@@ -331,20 +323,19 @@ class _LoginScreenState extends State<LoginScreen> {
     required IconData icon,
     required VoidCallback onPressed,
   }) {
-    return AspectRatio(
-      aspectRatio: 1,
-      child: Container(
-        decoration: BoxDecoration(
-          color: SafeJetColors.primaryAccent.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: SafeJetColors.primaryAccent.withOpacity(0.2),
-          ),
+    return Container(
+      width: 60,
+      height: 60,
+      decoration: BoxDecoration(
+        color: SafeJetColors.primaryAccent.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: SafeJetColors.primaryAccent.withOpacity(0.2),
         ),
-        child: IconButton(
-          icon: Icon(icon, color: Colors.white, size: 24),
-          onPressed: onPressed,
-        ),
+      ),
+      child: IconButton(
+        icon: Icon(icon, color: Colors.white, size: 30),
+        onPressed: onPressed,
       ),
     );
   }
