@@ -6,7 +6,7 @@ import '../../widgets/custom_app_bar.dart';
 import '../../widgets/custom_bottom_nav.dart';
 import 'tabs/markets_tab.dart';
 import 'tabs/trade_tab.dart';
-import 'tabs/p2p_tab.dart';
+import 'tabs/home_tab.dart';
 import 'tabs/wallets_tab.dart';
 import 'tabs/profile_tab.dart';
 
@@ -18,12 +18,12 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _currentIndex = 0;
+  int _currentIndex = 2;
 
   final List<Widget> _screens = [
     const MarketsTab(),
     const TradeTab(),
-    const P2PTab(),
+    const HomeTab(),
     const WalletsTab(),
     const ProfileTab(),
   ];

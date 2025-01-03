@@ -92,7 +92,7 @@ class CustomBottomNav extends StatelessWidget {
                     ],
                   ),
                   child: Icon(
-                    currentIndex == 2 ? Icons.group_rounded : Icons.group_outlined,
+                    currentIndex == 2 ? Icons.home_rounded : Icons.home_outlined,
                     color: Colors.black,
                     size: 26,
                   ),
