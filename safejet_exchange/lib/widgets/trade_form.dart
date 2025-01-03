@@ -36,6 +36,7 @@ class _TradeFormState extends State<TradeForm> {
     final mainColor = widget.isBuy ? SafeJetColors.success : SafeJetColors.error;
 
     return ListView(
+      physics: const ClampingScrollPhysics(),
       padding: const EdgeInsets.all(16),
       children: [
         // Order Type Selector
