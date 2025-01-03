@@ -24,6 +24,13 @@ class CustomBottomNav extends StatelessWidget {
             SafeJetColors.primaryBackground,
           ],
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 20,
+            offset: const Offset(0, -5),
+          ),
+        ],
       ),
       child: Stack(
         children: [
@@ -37,11 +44,11 @@ class CustomBottomNav extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _buildNavItem(0, Icons.show_chart_outlined, Icons.show_chart, 'Markets'),
-                  _buildNavItem(1, Icons.currency_exchange_outlined, Icons.currency_exchange, 'Trade'),
+                  _buildNavItem(0, Icons.candlestick_chart_rounded, Icons.candlestick_chart_rounded, 'Markets'),
+                  _buildNavItem(1, Icons.sync_alt_rounded, Icons.sync_alt_rounded, 'Trade'),
                   const SizedBox(width: 60),
-                  _buildNavItem(3, Icons.account_balance_wallet_outlined, Icons.account_balance_wallet, 'Wallets'),
-                  _buildNavItem(4, Icons.person_outline, Icons.person, 'Profile'),
+                  _buildNavItem(3, Icons.account_balance_wallet_rounded, Icons.account_balance_wallet_rounded, 'Wallets'),
+                  _buildNavItem(4, Icons.person_rounded, Icons.person_rounded, 'Profile'),
                 ],
               ),
             ),
@@ -54,8 +61,8 @@ class CustomBottomNav extends StatelessWidget {
               onTap: () => onTap(2),
               child: Center(
                 child: Container(
-                  width: 64,
-                  height: 64,
+                  width: 58,
+                  height: 58,
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
@@ -67,16 +74,16 @@ class CustomBottomNav extends StatelessWidget {
                     boxShadow: [
                       BoxShadow(
                         color: SafeJetColors.secondaryHighlight.withOpacity(0.3),
-                        blurRadius: 10,
+                        blurRadius: 12,
                         spreadRadius: 2,
                         offset: const Offset(0, -2),
                       ),
                     ],
                   ),
                   child: Icon(
-                    currentIndex == 2 ? Icons.people : Icons.people_outline,
+                    currentIndex == 2 ? Icons.group_rounded : Icons.group_outlined,
                     color: Colors.black,
-                    size: 28,
+                    size: 26,
                   ),
                 ),
               ),
@@ -105,17 +112,17 @@ class CustomBottomNav extends StatelessWidget {
               ),
               child: Icon(
                 isSelected ? activeIcon : icon,
-                color: isSelected ? SafeJetColors.secondaryHighlight : Colors.grey,
-                size: 24,
+                color: isSelected ? SafeJetColors.secondaryHighlight : Colors.grey[600],
+                size: 26,
               ),
             ),
             const SizedBox(height: 4),
             Text(
               label,
               style: TextStyle(
-                color: isSelected ? SafeJetColors.secondaryHighlight : Colors.grey,
+                color: isSelected ? SafeJetColors.secondaryHighlight : Colors.grey[600],
                 fontSize: 12,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
               ),
             ),
           ],

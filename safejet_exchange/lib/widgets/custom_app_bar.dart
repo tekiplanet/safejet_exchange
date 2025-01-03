@@ -36,18 +36,20 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: SafeJetColors.secondaryHighlight,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    'SJ',
-                    style: TextStyle(
-                      color: SafeJetColors.primaryBackground,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
+                    gradient: LinearGradient(
+                      colors: [
+                        SafeJetColors.secondaryHighlight,
+                        SafeJetColors.secondaryHighlight.withOpacity(0.8),
+                      ],
                     ),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: const Icon(
+                    Icons.rocket_launch_rounded,
+                    color: Colors.black,
+                    size: 20,
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -55,22 +57,24 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                   title ?? 'SafeJet',
                   style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 22,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: -0.5,
                   ),
                 ),
               ],
             ),
             Row(
               children: [
-                _buildIconButton(
-                  Icons.notifications_outlined,
-                  onNotificationTap,
+                _buildActionButton(
+                  icon: Icons.notifications_rounded,
+                  onTap: onNotificationTap,
+                  hasNotification: true,
                 ),
-                const SizedBox(width: 8),
-                _buildIconButton(
-                  Icons.brightness_6_outlined,
-                  onThemeToggle,
+                const SizedBox(width: 12),
+                _buildActionButton(
+                  icon: Icons.dark_mode_rounded,
+                  onTap: onThemeToggle,
                 ),
               ],
             ),
@@ -80,17 +84,39 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     );
   }
 
-  Widget _buildIconButton(IconData icon, VoidCallback? onTap) {
-    return Container(
-      decoration: BoxDecoration(
-        color: SafeJetColors.primaryAccent.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: IconButton(
-        icon: Icon(icon),
-        color: Colors.white,
-        onPressed: onTap,
-      ),
+  Widget _buildActionButton({
+    required IconData icon,
+    VoidCallback? onTap,
+    bool hasNotification = false,
+  }) {
+    return Stack(
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            color: SafeJetColors.primaryAccent.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: IconButton(
+            icon: Icon(icon),
+            color: Colors.white,
+            iconSize: 24,
+            onPressed: onTap,
+          ),
+        ),
+        if (hasNotification)
+          Positioned(
+            right: 8,
+            top: 8,
+            child: Container(
+              width: 8,
+              height: 8,
+              decoration: BoxDecoration(
+                color: SafeJetColors.secondaryHighlight,
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
+      ],
     );
   }
 } 
