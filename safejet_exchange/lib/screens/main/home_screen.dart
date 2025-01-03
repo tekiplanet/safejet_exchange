@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:animate_do/animate_do.dart';
 import '../../config/theme/colors.dart';
+import '../../widgets/custom_app_bar.dart';
+import '../../widgets/custom_bottom_nav.dart';
 import 'tabs/markets_tab.dart';
 import 'tabs/trade_tab.dart';
 import 'tabs/p2p_tab.dart';
@@ -27,120 +28,36 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              SafeJetColors.primaryBackground,
-              SafeJetColors.secondaryBackground,
-            ],
-          ),
+    return Material(
+      child: Scaffold(
+        extendBody: true,
+        extendBodyBehindAppBar: true,
+        backgroundColor: Colors.transparent,
+        appBar: CustomAppBar(
+          onNotificationTap: () {
+            // TODO: Show notifications
+          },
+          onThemeToggle: () {
+            // TODO: Toggle theme
+          },
         ),
-        child: SafeArea(
-          child: Column(
-            children: [
-              _buildAppBar(),
-              Expanded(
-                child: _screens[_currentIndex],
-              ),
-            ],
-          ),
-        ),
-      ),
-      bottomNavigationBar: _buildBottomNavBar(),
-    );
-  }
-
-  Widget _buildAppBar() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: SafeJetColors.primaryBackground.withOpacity(0.5),
-        border: Border(
-          bottom: BorderSide(
-            color: SafeJetColors.primaryAccent.withOpacity(0.2),
-          ),
-        ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // Logo
-          Text(
-            'SafeJet',
-            style: TextStyle(
-              color: SafeJetColors.textHighlight,
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
+        body: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                SafeJetColors.primaryBackground,
+                SafeJetColors.secondaryBackground,
+              ],
             ),
           ),
-          // Action Buttons
-          Row(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.notifications_outlined),
-                color: Colors.white,
-                onPressed: () {
-                  // TODO: Show notifications
-                },
-              ),
-              IconButton(
-                icon: const Icon(Icons.brightness_6_outlined),
-                color: Colors.white,
-                onPressed: () {
-                  // TODO: Toggle theme
-                },
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildBottomNavBar() {
-    return Container(
-      decoration: BoxDecoration(
-        color: SafeJetColors.primaryBackground,
-        border: Border(
-          top: BorderSide(
-            color: SafeJetColors.primaryAccent.withOpacity(0.2),
-          ),
+          child: _screens[_currentIndex],
         ),
-      ),
-      child: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (index) => setState(() => _currentIndex = index),
-        backgroundColor: Colors.transparent,
-        selectedItemColor: SafeJetColors.secondaryHighlight,
-        unselectedItemColor: Colors.grey[600],
-        type: BottomNavigationBarType.fixed,
-        elevation: 0,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.show_chart),
-            label: 'Markets',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.currency_exchange),
-            label: 'Trade',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.people_outline),
-            label: 'P2P',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.account_balance_wallet_outlined),
-            label: 'Wallets',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline),
-            label: 'Profile',
-          ),
-        ],
+        bottomNavigationBar: CustomBottomNav(
+          currentIndex: _currentIndex,
+          onTap: (index) => setState(() => _currentIndex = index),
+        ),
       ),
     );
   }
