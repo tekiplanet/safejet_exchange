@@ -30,62 +30,60 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         color: isDark 
             ? SafeJetColors.primaryBackground
             : SafeJetColors.lightBackground,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 20,
-          ),
-        ],
       ),
       child: SafeArea(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        SafeJetColors.secondaryHighlight,
-                        SafeJetColors.secondaryHighlight.withOpacity(0.8),
-                      ],
+        child: SizedBox(
+          height: 56,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // Logo Section
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: SafeJetColors.secondaryHighlight,
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    borderRadius: BorderRadius.circular(14),
+                    child: const Icon(
+                      Icons.rocket_launch_rounded,
+                      color: Colors.black,
+                      size: 20,
+                    ),
                   ),
-                  child: const Icon(
-                    Icons.rocket_launch_rounded,
-                    color: Colors.black,
-                    size: 20,
+                  const SizedBox(width: 12),
+                  Text(
+                    'SafeJet',
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      color: isDark ? Colors.white : SafeJetColors.lightText,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Text(
-                  title ?? 'SafeJet',
-                  style: theme.textTheme.headlineMedium,
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                _buildActionButton(
-                  icon: Icons.notifications_rounded,
-                  onTap: onNotificationTap,
-                  hasNotification: true,
-                  isDark: isDark,
-                ),
-                const SizedBox(width: 12),
-                _buildActionButton(
-                  icon: themeProvider.isDarkMode 
-                    ? Icons.light_mode_rounded 
-                    : Icons.dark_mode_rounded,
-                  onTap: onThemeToggle,
-                  isDark: isDark,
-                ),
-              ],
-            ),
-          ],
+                ],
+              ),
+              
+              // Action Buttons
+              Row(
+                children: [
+                  _buildActionButton(
+                    icon: Icons.notifications_outlined,
+                    onTap: onNotificationTap,
+                    hasNotification: true,
+                    isDark: isDark,
+                  ),
+                  const SizedBox(width: 8),
+                  _buildActionButton(
+                    icon: isDark 
+                        ? Icons.light_mode_outlined
+                        : Icons.dark_mode_outlined,
+                    onTap: onThemeToggle,
+                    isDark: isDark,
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -99,24 +97,11 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   }) {
     return Stack(
       children: [
-        Container(
-          decoration: BoxDecoration(
-            color: isDark 
-                ? SafeJetColors.primaryAccent.withOpacity(0.1)
-                : SafeJetColors.lightCardBackground,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: isDark
-                  ? SafeJetColors.primaryAccent.withOpacity(0.2)
-                  : SafeJetColors.lightCardBorder,
-            ),
-          ),
-          child: IconButton(
-            icon: Icon(icon),
-            color: isDark ? Colors.white : SafeJetColors.lightText,
-            iconSize: 24,
-            onPressed: onTap,
-          ),
+        IconButton(
+          icon: Icon(icon),
+          color: isDark ? Colors.white : SafeJetColors.lightText,
+          iconSize: 24,
+          onPressed: onTap,
         ),
         if (hasNotification)
           Positioned(

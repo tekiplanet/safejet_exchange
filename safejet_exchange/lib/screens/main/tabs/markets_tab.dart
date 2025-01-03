@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
+import 'dart:math' show sin;
 import '../../../config/theme/colors.dart';
 import '../../../widgets/mini_chart_painter.dart';
+import '../../../widgets/mini_sparkline_painter.dart';
 
 class MarketsTab extends StatefulWidget {
   const MarketsTab({super.key});
@@ -13,6 +15,9 @@ class MarketsTab extends StatefulWidget {
 class _MarketsTabState extends State<MarketsTab> {
   final List<String> _categories = ['All', 'Favorites', 'Gainers', 'Losers', 'Volume'];
   int _selectedCategoryIndex = 0;
+  bool _isRefreshing = false;
+  final _searchController = TextEditingController();
+  final _refreshKey = GlobalKey<RefreshIndicatorState>();
 
   @override
   Widget build(BuildContext context) {
@@ -21,211 +26,229 @@ class _MarketsTabState extends State<MarketsTab> {
 
     return SafeArea(
       bottom: false,
-      child: CustomScrollView(
-        slivers: [
-          // Market Overview Card
-          SliverToBoxAdapter(
-            child: FadeInDown(
-              duration: const Duration(milliseconds: 600),
-              child: Container(
-                margin: const EdgeInsets.all(16),
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: isDark
-                        ? [
-                            SafeJetColors.secondaryHighlight.withOpacity(0.15),
-                            SafeJetColors.primaryAccent.withOpacity(0.05),
-                          ]
-                        : [
-                            SafeJetColors.lightCardBackground,
-                            SafeJetColors.lightCardBackground,
-                          ],
+      child: RefreshIndicator(
+        key: _refreshKey,
+        color: SafeJetColors.secondaryHighlight,
+        backgroundColor: isDark ? SafeJetColors.primaryBackground : Colors.white,
+        onRefresh: () async {
+          setState(() => _isRefreshing = true);
+          // TODO: Implement actual refresh logic
+          await Future.delayed(const Duration(seconds: 1));
+          setState(() => _isRefreshing = false);
+        },
+        child: CustomScrollView(
+          slivers: [
+            // Search Bar
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: _buildSearchBar(),
+              ),
+            ),
+            // Market Overview Card
+            SliverToBoxAdapter(
+              child: FadeInDown(
+                duration: const Duration(milliseconds: 600),
+                child: Container(
+                  margin: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: isDark
+                          ? [
+                              SafeJetColors.secondaryHighlight.withOpacity(0.15),
+                              SafeJetColors.primaryAccent.withOpacity(0.05),
+                            ]
+                          : [
+                              SafeJetColors.lightCardBackground,
+                              SafeJetColors.lightCardBackground,
+                            ],
+                    ),
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(
+                      color: isDark
+                          ? SafeJetColors.secondaryHighlight.withOpacity(0.2)
+                          : SafeJetColors.lightCardBorder,
+                    ),
                   ),
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(
-                    color: isDark
-                        ? SafeJetColors.secondaryHighlight.withOpacity(0.2)
-                        : SafeJetColors.lightCardBorder,
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Total Market Cap',
+                                style: theme.textTheme.bodyMedium,
+                              ),
+                              const SizedBox(height: 8),
+                              Row(
+                                children: [
+                                  Text(
+                                    '\$1.23T',
+                                    style: theme.textTheme.headlineMedium?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 4,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: SafeJetColors.success.withOpacity(0.2),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          Icons.arrow_upward_rounded,
+                                          color: SafeJetColors.success,
+                                          size: 16,
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          '2.3%',
+                                          style: TextStyle(
+                                            color: SafeJetColors.success,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          _buildMiniChart(),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: _buildQuickStat(
+                              'BTC Dom.',
+                              '43.2%',
+                              Icons.pie_chart_rounded,
+                              isDark,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: _buildQuickStat(
+                              '24h Vol.',
+                              '\$84.2B',
+                              Icons.bar_chart_rounded,
+                              isDark,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: _buildQuickStat(
+                              'Pairs',
+                              '12,234',
+                              Icons.currency_exchange_rounded,
+                              isDark,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
+              ),
+            ),
+
+            // Trending Section
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Total Market Cap',
-                              style: theme.textTheme.bodyMedium,
-                            ),
-                            const SizedBox(height: 8),
-                            Row(
-                              children: [
-                                Text(
-                                  '\$1.23T',
-                                  style: theme.textTheme.headlineMedium?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 4,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: SafeJetColors.success.withOpacity(0.2),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        Icons.arrow_upward_rounded,
-                                        color: SafeJetColors.success,
-                                        size: 16,
-                                      ),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        '2.3%',
-                                        style: TextStyle(
-                                          color: SafeJetColors.success,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        _buildMiniChart(),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: _buildQuickStat(
-                            'BTC Dom.',
-                            '43.2%',
-                            Icons.pie_chart_rounded,
-                            isDark,
+                        Text(
+                          'Trending',
+                          style: theme.textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: _buildQuickStat(
-                            '24h Vol.',
-                            '\$84.2B',
-                            Icons.bar_chart_rounded,
-                            isDark,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: _buildQuickStat(
-                            'Pairs',
-                            '12,234',
-                            Icons.currency_exchange_rounded,
-                            isDark,
+                        TextButton(
+                          onPressed: () {
+                            // TODO: Show all trending
+                          },
+                          child: Row(
+                            children: [
+                              Text(
+                                'See All',
+                                style: TextStyle(
+                                  color: SafeJetColors.secondaryHighlight,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              Icon(
+                                Icons.arrow_forward_rounded,
+                                color: SafeJetColors.secondaryHighlight,
+                                size: 16,
+                              ),
+                            ],
                           ),
                         ),
                       ],
+                    ),
+                    const SizedBox(height: 16),
+                    SizedBox(
+                      height: 160,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: 5,
+                        itemBuilder: (context, index) => _buildTrendingCoinCard(),
+                      ),
                     ),
                   ],
                 ),
               ),
             ),
-          ),
 
-          // Trending Section
-          SliverToBoxAdapter(
-            child: Padding(
+            // Categories
+            SliverToBoxAdapter(
+              child: Container(
+                height: 50,
+                margin: const EdgeInsets.symmetric(vertical: 24),
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: _categories.length,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  itemBuilder: (context, index) => _buildCategoryChip(index),
+                ),
+              ),
+            ),
+
+            // Market List
+            SliverPadding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Trending',
-                        style: theme.textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          // TODO: Show all trending
-                        },
-                        child: Row(
-                          children: [
-                            Text(
-                              'See All',
-                              style: TextStyle(
-                                color: SafeJetColors.secondaryHighlight,
-                              ),
-                            ),
-                            const SizedBox(width: 4),
-                            Icon(
-                              Icons.arrow_forward_rounded,
-                              color: SafeJetColors.secondaryHighlight,
-                              size: 16,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  SizedBox(
-                    height: 160,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: 5,
-                      itemBuilder: (context, index) => _buildTrendingCoinCard(),
-                    ),
-                  ),
-                ],
+              sliver: SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) => _buildMarketListItem(index),
+                  childCount: 10,
+                ),
               ),
             ),
-          ),
 
-          // Categories
-          SliverToBoxAdapter(
-            child: Container(
-              height: 50,
-              margin: const EdgeInsets.symmetric(vertical: 24),
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: _categories.length,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                itemBuilder: (context, index) => _buildCategoryChip(index),
-              ),
+            // Bottom Padding for nav bar
+            const SliverPadding(
+              padding: EdgeInsets.only(bottom: 100),
             ),
-          ),
-
-          // Market List
-          SliverPadding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            sliver: SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (context, index) => _buildMarketListItem(index),
-                childCount: 10,
-              ),
-            ),
-          ),
-
-          // Bottom Padding for nav bar
-          const SliverPadding(
-            padding: EdgeInsets.only(bottom: 100),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -443,19 +466,13 @@ class _MarketsTabState extends State<MarketsTab> {
               ? SafeJetColors.primaryAccent.withOpacity(0.2)
               : SafeJetColors.lightCardBorder,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
-          ),
-        ],
       ),
       child: Row(
         children: [
+          // Coin Icon
           Container(
-            width: 48,
-            height: 48,
+            width: 40,
+            height: 40,
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
@@ -465,59 +482,172 @@ class _MarketsTabState extends State<MarketsTab> {
               ),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Icon(Icons.currency_bitcoin, color: Colors.black, size: 28),
+            child: const Icon(Icons.currency_bitcoin, color: Colors.black, size: 24),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 12),
+          
+          // Coin Info
           Expanded(
+            flex: 2,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Bitcoin',
-                      style: theme.textTheme.bodyLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      '\$42,384.21',
-                      style: theme.textTheme.bodyLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
+                Text(
+                  'Bitcoin',
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 4),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'BTC',
-                      style: theme.textTheme.bodyMedium,
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: SafeJetColors.success.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        '+2.34%',
-                        style: TextStyle(
-                          color: SafeJetColors.success,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ],
+                Text(
+                  'BTC',
+                  style: theme.textTheme.bodyMedium,
                 ),
               ],
+            ),
+          ),
+          
+          // Price Info
+          Expanded(
+            flex: 2,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  '\$42,384.21',
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 4),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: SafeJetColors.success.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    '+2.34%',
+                    style: TextStyle(
+                      color: SafeJetColors.success,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // Sparkline Chart
+          const SizedBox(width: 12),
+          SizedBox(
+            width: 80,
+            height: 40,
+            child: CustomPaint(
+              painter: MiniSparklinePainter(
+                data: _generateDummyData(),
+                color: SafeJetColors.success,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  List<double> _generateDummyData() {
+    return List.generate(20, (i) => 0.5 + 0.5 * sin(i * 0.5));
+  }
+
+  Widget _buildSearchBar() {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    return Container(
+      height: 56,
+      decoration: BoxDecoration(
+        color: isDark 
+            ? SafeJetColors.primaryAccent.withOpacity(0.1)
+            : SafeJetColors.lightCardBackground,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isDark
+              ? SafeJetColors.primaryAccent.withOpacity(0.2)
+              : SafeJetColors.lightCardBorder,
+        ),
+      ),
+      child: Row(
+        children: [
+          const SizedBox(width: 16),
+          Icon(
+            Icons.search_rounded,
+            color: isDark ? Colors.grey[400] : SafeJetColors.lightTextSecondary,
+            size: 24,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: TextField(
+              controller: _searchController,
+              style: theme.textTheme.bodyLarge,
+              decoration: InputDecoration(
+                hintText: 'Search coins...',
+                hintStyle: theme.textTheme.bodyMedium?.copyWith(
+                  color: isDark ? Colors.grey[600] : SafeJetColors.lightTextSecondary,
+                ),
+                border: InputBorder.none,
+                contentPadding: const EdgeInsets.symmetric(vertical: 16),
+                isDense: true,
+              ),
+              onChanged: (value) {
+                // TODO: Implement search functionality
+              },
+            ),
+          ),
+          if (_searchController.text.isNotEmpty)
+            IconButton(
+              icon: Icon(
+                Icons.close_rounded,
+                color: isDark ? Colors.grey[400] : SafeJetColors.lightTextSecondary,
+                size: 20,
+              ),
+              onPressed: () {
+                setState(() {
+                  _searchController.clear();
+                });
+              },
+            ),
+          const SizedBox(width: 8),
+          Container(
+            height: 56,
+            width: 56,
+            decoration: BoxDecoration(
+              color: isDark 
+                  ? SafeJetColors.primaryAccent.withOpacity(0.1)
+                  : SafeJetColors.lightCardBackground.withOpacity(0.8),
+              borderRadius: const BorderRadius.horizontal(right: Radius.circular(16)),
+              border: Border(
+                left: BorderSide(
+                  color: isDark
+                      ? SafeJetColors.primaryAccent.withOpacity(0.2)
+                      : SafeJetColors.lightCardBorder,
+                ),
+              ),
+            ),
+            child: IconButton(
+              icon: Icon(
+                Icons.tune_rounded,
+                color: isDark ? Colors.white : SafeJetColors.lightText,
+                size: 24,
+              ),
+              onPressed: () {
+                // TODO: Show filter options
+              },
             ),
           ),
         ],
