@@ -2,3 +2,6 @@ flutter:
   assets:
     - assets/images/
     - assets/animations/ 
+
+dependencies:
+  k_chart: ^0.7.1 
