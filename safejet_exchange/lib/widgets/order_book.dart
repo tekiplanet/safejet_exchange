@@ -12,27 +12,27 @@ class OrderBook extends StatelessWidget {
     return Column(
       children: [
         // Header
-        Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Order Book',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              Row(
-                children: [
-                  _buildPrecisionButton('0.1', true, isDark),
-                  const SizedBox(width: 8),
-                  _buildPrecisionButton('0.01', false, isDark),
-                ],
-              ),
-            ],
-          ),
-        ),
+        // Padding(
+        //   padding: const EdgeInsets.all(16),
+        //   child: Row(
+        //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        //     children: [
+        //       Text(
+        //         'Order Book',
+        //         style: theme.textTheme.titleMedium?.copyWith(
+        //           fontWeight: FontWeight.bold,
+        //         ),
+        //       ),
+        //       Row(
+        //         children: [
+        //           _buildPrecisionButton('0.1', true, isDark),
+        //           const SizedBox(width: 8),
+        //           _buildPrecisionButton('0.01', false, isDark),
+        //         ],
+        //       ),
+        //     ],
+        //   ),
+        // ),
 
         // Column Headers
         Padding(
