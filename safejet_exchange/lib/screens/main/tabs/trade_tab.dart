@@ -64,10 +64,10 @@ class _TradeTabState extends State<TradeTab> with SingleTickerProviderStateMixin
                   // Timeframe Selection
                   _buildTimeframeSelector(isDark),
 
-                  // Chart
+                  // Chart with reduced height
                   Container(
-                    height: 300,
-                    margin: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                    height: 250,
+                    margin: const EdgeInsets.fromLTRB(16, 8, 16, 8),
                     decoration: BoxDecoration(
                       color: isDark 
                           ? SafeJetColors.primaryAccent.withOpacity(0.1)
@@ -84,7 +84,13 @@ class _TradeTabState extends State<TradeTab> with SingleTickerProviderStateMixin
 
                   // Trading Interface
                   Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 16),
+                    height: 600,
+                    margin: EdgeInsets.fromLTRB(
+                      16, 
+                      0, 
+                      16, 
+                      MediaQuery.of(context).size.height * 0.15, // 10% of screen height for bottom margin
+                    ),
                     decoration: BoxDecoration(
                       color: isDark 
                           ? SafeJetColors.primaryAccent.withOpacity(0.1)
@@ -99,7 +105,6 @@ class _TradeTabState extends State<TradeTab> with SingleTickerProviderStateMixin
                       ),
                     ),
                     child: Column(
-                      mainAxisSize: MainAxisSize.min,
                       children: [
                         // Buy/Sell Tabs
                         TabBar(
@@ -116,32 +121,21 @@ class _TradeTabState extends State<TradeTab> with SingleTickerProviderStateMixin
                         ),
                         
                         // Trading Form
-                        LayoutBuilder(
-                          builder: (context, constraints) {
-                            final screenHeight = MediaQuery.of(context).size.height;
-                            final isSmallScreen = screenHeight < 700;
-                            final isLargeScreen = screenHeight > 900;
-
-                            return Container(
-                              height: isSmallScreen 
-                                  ? 700 
-                                  : (isLargeScreen ? 1000 : screenHeight * 0.85),
-                              child: TabBarView(
-                                controller: _tabController,
-                                children: const [
-                                  TradeForm(isBuy: true),
-                                  TradeForm(isBuy: false),
-                                ],
-                              ),
-                            );
-                          },
+                        Expanded(
+                          child: TabBarView(
+                            controller: _tabController,
+                            children: const [
+                              TradeForm(isBuy: true),
+                              TradeForm(isBuy: false),
+                            ],
+                          ),
                         ),
                       ],
                     ),
                   ),
 
-                  // Bottom padding
-                  const SizedBox(height: 100),  // Increased bottom padding
+                  // Keep the bottom padding
+                  const SizedBox(height: 100),
                 ],
               ),
             ),
