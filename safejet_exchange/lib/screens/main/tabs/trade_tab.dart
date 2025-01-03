@@ -5,6 +5,7 @@ import '../../../widgets/candlestick_chart.dart';
 import '../../../widgets/order_book.dart';
 import '../../../widgets/trade_form.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
+import '../../../widgets/trading_pair_selector.dart';
 
 class TradeTab extends StatefulWidget {
   const TradeTab({super.key});
@@ -146,71 +147,88 @@ class _TradeTabState extends State<TradeTab> with SingleTickerProviderStateMixin
   }
 
   Widget _buildTradingPairHeader(ThemeData theme, bool isDark) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: isDark 
-            ? SafeJetColors.primaryBackground
-            : SafeJetColors.lightBackground,
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: SafeJetColors.secondaryHighlight,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const Icon(
-              Icons.currency_bitcoin,
-              color: Colors.black,
-              size: 24,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'BTC/USDT',
-                style: theme.textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+    return GestureDetector(
+      onTap: () async {
+        // Show trading pair selector
+        final result = await showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          backgroundColor: Colors.transparent,
+          builder: (context) => const TradingPairSelector(),
+        );
+        
+        // Handle selected pair
+        if (result != null) {
+          // TODO: Update trading pair
+          print(result);
+        }
+      },
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: isDark 
+              ? SafeJetColors.primaryBackground
+              : SafeJetColors.lightBackground,
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: SafeJetColors.secondaryHighlight,
+                borderRadius: BorderRadius.circular(12),
               ),
-              const SizedBox(height: 4),
-              Row(
-                children: [
-                  Text(
-                    '\$42,384.21',
-                    style: theme.textTheme.bodyLarge?.copyWith(
-                      color: SafeJetColors.success,
-                      fontWeight: FontWeight.bold,
-                    ),
+              child: const Icon(
+                Icons.currency_bitcoin,
+                color: Colors.black,
+                size: 24,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'BTC/USDT',
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
                   ),
-                  const SizedBox(width: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: SafeJetColors.success.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      '+2.34%',
-                      style: TextStyle(
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    Text(
+                      '\$42,384.21',
+                      style: theme.textTheme.bodyLarge?.copyWith(
                         color: SafeJetColors.success,
-                        fontSize: 12,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ],
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: SafeJetColors.success.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        '+2.34%',
+                        style: TextStyle(
+                          color: SafeJetColors.success,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
