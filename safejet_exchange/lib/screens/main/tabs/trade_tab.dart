@@ -63,75 +63,86 @@ class _TradeTabState extends State<TradeTab> with SingleTickerProviderStateMixin
                 physics: const ClampingScrollPhysics(),
                 children: [
                   // Timeframe Selection
-                  _buildTimeframeSelector(isDark),
+                  FadeInDown(
+                    duration: const Duration(milliseconds: 600),
+                    child: _buildTimeframeSelector(isDark),
+                  ),
 
-                  // Chart with reduced height
-                  Container(
-                    height: 250,
-                    margin: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-                    decoration: BoxDecoration(
-                      color: isDark 
-                          ? SafeJetColors.primaryAccent.withOpacity(0.1)
-                          : SafeJetColors.lightCardBackground,
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                        color: isDark
-                            ? SafeJetColors.primaryAccent.withOpacity(0.2)
-                            : SafeJetColors.lightCardBorder,
+                  // Chart
+                  FadeInDown(
+                    duration: const Duration(milliseconds: 600),
+                    delay: const Duration(milliseconds: 200),
+                    child: Container(
+                      height: 250,
+                      margin: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                      decoration: BoxDecoration(
+                        color: isDark 
+                            ? SafeJetColors.primaryAccent.withOpacity(0.1)
+                            : SafeJetColors.lightCardBackground,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: isDark
+                              ? SafeJetColors.primaryAccent.withOpacity(0.2)
+                              : SafeJetColors.lightCardBorder,
+                        ),
                       ),
+                      child: const CandlestickChart(),
                     ),
-                    child: const CandlestickChart(),
                   ),
 
                   // Trading Interface
-                  Container(
-                    height: 600,
-                    margin: EdgeInsets.fromLTRB(
-                      16, 
-                      0, 
-                      16, 
-                      MediaQuery.of(context).size.height * 0.15, // 10% of screen height for bottom margin
-                    ),
-                    decoration: BoxDecoration(
-                      color: isDark 
-                          ? SafeJetColors.primaryAccent.withOpacity(0.1)
-                          : SafeJetColors.lightCardBackground,
-                      borderRadius: const BorderRadius.vertical(
-                        top: Radius.circular(20),
+                  FadeInDown(
+                    duration: const Duration(milliseconds: 600),
+                    delay: const Duration(milliseconds: 300),
+                    child: Container(
+                      height: 600,
+                      margin: EdgeInsets.fromLTRB(
+                        16, 
+                        0, 
+                        16, 
+                        MediaQuery.of(context).size.height * 0.15, // 10% of screen height for bottom margin
                       ),
-                      border: Border.all(
-                        color: isDark
-                            ? SafeJetColors.primaryAccent.withOpacity(0.2)
-                            : SafeJetColors.lightCardBorder,
-                      ),
-                    ),
-                    child: Column(
-                      children: [
-                        // Buy/Sell Tabs
-                        TabBar(
-                          controller: _tabController,
-                          tabs: [
-                            Tab(text: 'Buy BTC'),
-                            Tab(text: 'Sell BTC'),
-                          ],
-                          labelColor: SafeJetColors.secondaryHighlight,
-                          unselectedLabelColor: isDark 
-                              ? Colors.grey[400]
-                              : SafeJetColors.lightTextSecondary,
-                          indicatorColor: SafeJetColors.secondaryHighlight,
+                      decoration: BoxDecoration(
+                        color: isDark 
+                            ? SafeJetColors.primaryAccent.withOpacity(0.1)
+                            : SafeJetColors.lightCardBackground,
+                        borderRadius: const BorderRadius.vertical(
+                          top: Radius.circular(20),
                         ),
-                        
-                        // Trading Form
-                        Expanded(
-                          child: TabBarView(
+                        border: Border.all(
+                          color: isDark
+                              ? SafeJetColors.primaryAccent.withOpacity(0.2)
+                              : SafeJetColors.lightCardBorder,
+                        ),
+                      ),
+                      child: Column(
+                        children: [
+                          // Buy/Sell Tabs
+                          TabBar(
                             controller: _tabController,
-                            children: const [
-                              TradeForm(isBuy: true),
-                              TradeForm(isBuy: false),
+                            tabs: [
+                              Tab(text: 'Buy BTC'),
+                              Tab(text: 'Sell BTC'),
                             ],
+                            labelColor: SafeJetColors.secondaryHighlight,
+                            unselectedLabelColor: isDark 
+                                ? Colors.grey[400]
+                                : SafeJetColors.lightTextSecondary,
+                            indicatorColor: SafeJetColors.secondaryHighlight,
                           ),
-                        ),
-                      ],
+                          
+                          // Trading Form
+                          Expanded(
+                            child: TabBarView(
+                              controller: _tabController,
+                              children: const [
+                                TradeForm(isBuy: true),
+                                TradeForm(isBuy: false),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
 

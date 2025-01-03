@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../../config/theme/colors.dart';
+import 'package:animate_do/animate_do.dart';
+import '../../wallet/deposit_screen.dart';
+import '../../wallet/withdraw_screen.dart';
+import '../../wallet/transaction_history_screen.dart';
 
 class WalletsTab extends StatefulWidget {
   const WalletsTab({super.key});
@@ -15,12 +19,19 @@ class _WalletsTabState extends State<WalletsTab> {
 
   final double _ngnRate = 1200.0;
 
+  String _formatNumber(double number) {
+    return number.toStringAsFixed(2).replaceAllMapped(
+      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+      (Match m) => '${m[1]},'
+    );
+  }
+
   String _formatBalance(bool inUSD) {
     if (inUSD) {
-      return '\$12,384.21';
+      return '\$${_formatNumber(12384.21)}';
     }
     final ngnBalance = 12384.21 * _ngnRate;
-    return '₦${ngnBalance.toStringAsFixed(2)}';
+    return '₦${_formatNumber(ngnBalance)}';
   }
 
   @override
@@ -33,177 +44,220 @@ class _WalletsTabState extends State<WalletsTab> {
         slivers: [
           // Portfolio Value Card
           SliverToBoxAdapter(
-            child: Container(
-              margin: const EdgeInsets.all(16),
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: isDark
-                      ? [
-                          SafeJetColors.secondaryHighlight.withOpacity(0.15),
-                          SafeJetColors.primaryAccent.withOpacity(0.05),
-                        ]
-                      : [
-                          SafeJetColors.lightCardBackground,
-                          SafeJetColors.lightCardBackground,
+            child: FadeInDown(
+              duration: const Duration(milliseconds: 600),
+              child: Container(
+                margin: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: isDark
+                        ? [
+                            SafeJetColors.secondaryHighlight.withOpacity(0.15),
+                            SafeJetColors.primaryAccent.withOpacity(0.05),
+                          ]
+                        : [
+                            SafeJetColors.lightCardBackground,
+                            SafeJetColors.lightCardBackground,
+                          ],
+                  ),
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(
+                    color: isDark
+                        ? SafeJetColors.secondaryHighlight.withOpacity(0.2)
+                        : SafeJetColors.lightCardBorder,
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    // Currency Toggle
+                    Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: isDark 
+                            ? SafeJetColors.primaryAccent.withOpacity(0.1)
+                            : SafeJetColors.lightCardBackground,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: isDark
+                              ? SafeJetColors.primaryAccent.withOpacity(0.2)
+                              : SafeJetColors.lightCardBorder,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          _buildCurrencyToggle('USD', true, isDark),
+                          _buildCurrencyToggle('NGN', false, isDark),
                         ],
-                ),
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(
-                  color: isDark
-                      ? SafeJetColors.secondaryHighlight.withOpacity(0.2)
-                      : SafeJetColors.lightCardBorder,
-                ),
-              ),
-              child: Column(
-                children: [
-                  // Currency Toggle
-                  Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      color: isDark 
-                          ? SafeJetColors.primaryAccent.withOpacity(0.1)
-                          : SafeJetColors.lightCardBackground,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: isDark
-                            ? SafeJetColors.primaryAccent.withOpacity(0.2)
-                            : SafeJetColors.lightCardBorder,
                       ),
                     ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
+                    const SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        _buildCurrencyToggle('USD', true, isDark),
-                        _buildCurrencyToggle('NGN', false, isDark),
+                        Text(
+                          'Total Balance',
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                            color: isDark ? Colors.grey[400] : SafeJetColors.lightTextSecondary,
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const TransactionHistoryScreen(),
+                              ),
+                            );
+                          },
+                          child: Row(
+                            children: [
+                              Text(
+                                'History',
+                                style: TextStyle(
+                                  color: SafeJetColors.secondaryHighlight,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              Icon(
+                                Icons.arrow_forward_ios_rounded,
+                                color: SafeJetColors.secondaryHighlight,
+                                size: 14,
+                              ),
+                            ],
+                          ),
+                        ),
                       ],
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Total Balance',
-                    style: theme.textTheme.bodyLarge?.copyWith(
-                      color: isDark ? Colors.grey[400] : SafeJetColors.lightTextSecondary,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    _formatBalance(_showInUSD),
-                    style: theme.textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: SafeJetColors.success.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      '+\$234.12 (1.93%)',
-                      style: TextStyle(
-                        color: SafeJetColors.success,
-                        fontWeight: FontWeight.bold,
+                    const SizedBox(height: 8),
+                    _buildBalanceText(_formatBalance(_showInUSD)),
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
                       ),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () {
-                            // TODO: Handle deposit
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: SafeJetColors.success,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            elevation: 0,
-                          ),
-                          child: const Text('Deposit'),
+                      decoration: BoxDecoration(
+                        color: SafeJetColors.success.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        '+\$${_formatNumber(234.12)} (1.93%)',
+                        style: TextStyle(
+                          color: SafeJetColors.success,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () {
-                            // TODO: Handle withdraw
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: isDark
-                                ? SafeJetColors.primaryAccent.withOpacity(0.1)
-                                : SafeJetColors.lightCardBackground,
-                            foregroundColor: isDark ? Colors.white : SafeJetColors.lightText,
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              side: BorderSide(
-                                color: isDark
-                                    ? SafeJetColors.primaryAccent.withOpacity(0.2)
-                                    : SafeJetColors.lightCardBorder,
+                    ),
+                    const SizedBox(height: 24),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const DepositScreen(),
+                                ),
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: SafeJetColors.success,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
                               ),
+                              elevation: 0,
                             ),
-                            elevation: 0,
+                            child: const Text('Deposit'),
                           ),
-                          child: const Text('Withdraw'),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const WithdrawScreen(),
+                                ),
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: isDark
+                                  ? SafeJetColors.primaryAccent.withOpacity(0.1)
+                                  : SafeJetColors.lightCardBackground,
+                              foregroundColor: isDark ? Colors.white : SafeJetColors.lightText,
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                side: BorderSide(
+                                  color: isDark
+                                      ? SafeJetColors.primaryAccent.withOpacity(0.2)
+                                      : SafeJetColors.lightCardBorder,
+                                ),
+                              ),
+                              elevation: 0,
+                            ),
+                            child: const Text('Withdraw'),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
 
           // Wallet Type Filter
           SliverToBoxAdapter(
-            child: Container(
-              height: 40,
-              margin: const EdgeInsets.symmetric(horizontal: 16),
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: _filters.length,
-                itemBuilder: (context, index) {
-                  final isSelected = _filters[index] == _selectedFilter;
-                  return GestureDetector(
-                    onTap: () => setState(() => _selectedFilter = _filters[index]),
-                    child: Container(
-                      margin: const EdgeInsets.only(right: 8),
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      decoration: BoxDecoration(
-                        color: isSelected
-                            ? SafeJetColors.secondaryHighlight
-                            : Colors.transparent,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
+            child: FadeInDown(
+              duration: const Duration(milliseconds: 600),
+              delay: const Duration(milliseconds: 200),
+              child: Container(
+                height: 40,
+                margin: const EdgeInsets.symmetric(horizontal: 16),
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: _filters.length,
+                  itemBuilder: (context, index) {
+                    final isSelected = _filters[index] == _selectedFilter;
+                    return GestureDetector(
+                      onTap: () => setState(() => _selectedFilter = _filters[index]),
+                      child: Container(
+                        margin: const EdgeInsets.only(right: 8),
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        decoration: BoxDecoration(
                           color: isSelected
                               ? SafeJetColors.secondaryHighlight
-                              : (isDark
-                                  ? SafeJetColors.primaryAccent.withOpacity(0.2)
-                                  : SafeJetColors.lightCardBorder),
+                              : Colors.transparent,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: isSelected
+                                ? SafeJetColors.secondaryHighlight
+                                : (isDark
+                                    ? SafeJetColors.primaryAccent.withOpacity(0.2)
+                                    : SafeJetColors.lightCardBorder),
+                          ),
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          _filters[index],
+                          style: TextStyle(
+                            color: isSelected
+                                ? Colors.black
+                                : (isDark ? Colors.white : SafeJetColors.lightText),
+                            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                          ),
                         ),
                       ),
-                      alignment: Alignment.center,
-                      child: Text(
-                        _filters[index],
-                        style: TextStyle(
-                          color: isSelected
-                              ? Colors.black
-                              : (isDark ? Colors.white : SafeJetColors.lightText),
-                          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                        ),
-                      ),
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               ),
             ),
           ),
@@ -213,7 +267,11 @@ class _WalletsTabState extends State<WalletsTab> {
             padding: const EdgeInsets.all(16),
             sliver: SliverList(
               delegate: SliverChildBuilderDelegate(
-                (context, index) => _buildAssetItem(isDark, theme),
+                (context, index) => FadeInDown(
+                  duration: const Duration(milliseconds: 600),
+                  delay: Duration(milliseconds: 300 + (index * 100)),
+                  child: _buildAssetItem(isDark, theme),
+                ),
                 childCount: 10,
               ),
             ),
@@ -298,13 +356,11 @@ class _WalletsTabState extends State<WalletsTab> {
                 ),
               ),
               const SizedBox(height: 4),
-              Text(
+              _buildAssetBalance(
                 _showInUSD 
-                    ? '\$${usdBalance.toStringAsFixed(2)}'
-                    : '₦${ngnBalance.toStringAsFixed(2)}',
-                style: TextStyle(
-                  color: isDark ? Colors.grey[400] : SafeJetColors.lightTextSecondary,
-                ),
+                    ? '\$${_formatNumber(usdBalance)}'
+                    : '₦${_formatNumber(ngnBalance)}',
+                isDark,
               ),
             ],
           ),
@@ -333,6 +389,44 @@ class _WalletsTabState extends State<WalletsTab> {
             color: isSelected ? Colors.black : (isDark ? Colors.white : SafeJetColors.lightText),
             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBalanceText(String text) {
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 300),
+      transitionBuilder: (Widget child, Animation<double> animation) {
+        return FadeTransition(
+          opacity: animation,
+          child: SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(0.0, 0.2),
+              end: Offset.zero,
+            ).animate(animation),
+            child: child,
+          ),
+        );
+      },
+      child: Text(
+        text,
+        key: ValueKey<String>(text),
+        style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAssetBalance(String text, bool isDark) {
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 300),
+      child: Text(
+        text,
+        key: ValueKey<String>(text),
+        style: TextStyle(
+          color: isDark ? Colors.grey[400] : SafeJetColors.lightTextSecondary,
         ),
       ),
     );
