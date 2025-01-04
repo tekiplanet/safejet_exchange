@@ -3,9 +3,11 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'config/theme/theme_provider.dart';
 import 'screens/auth/login_screen.dart';
+import './services/service_locator.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await setupServices();
   final prefs = await SharedPreferences.getInstance();
   final themeProvider = ThemeProvider()..init(prefs);
   

@@ -10,6 +10,14 @@ import '../../widgets/network_selection_modal.dart';
 import '../../models/coin.dart';
 import '../../widgets/two_factor_dialog.dart';
 import '../../services/biometric_service.dart';
+import './qr_scanner_screen.dart';
+import '../../models/recent_address.dart';
+import '../../widgets/address_book_modal.dart';
+import '../../services/address_service.dart';
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:get_it/get_it.dart';
+import '../../services/service_locator.dart';
 
 class WithdrawScreen extends StatefulWidget {
   const WithdrawScreen({super.key});
@@ -225,6 +233,17 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
     );
   }
 
+  Future<void> _saveAddress(String address) async {
+    await getIt<AddressService>().addRecentAddress(
+      RecentAddress(
+        address: address,
+        coin: _selectedCoin.symbol,
+        network: _selectedNetwork.name,
+        lastUsed: DateTime.now(),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -371,17 +390,58 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
                               Expanded(
                                 child: TextField(
                                   controller: _addressController,
+                                  onChanged: (value) => _validateAddress(value),
                                   style: theme.textTheme.bodyMedium,
                                   decoration: InputDecoration(
-                                    hintText: 'Enter withdrawal address',
+                                    hintText: 'Enter wallet address',
                                     border: InputBorder.none,
-                                    isDense: true,
-                                    contentPadding: EdgeInsets.zero,
+                                    isDense: false,
+                                    contentPadding: const EdgeInsets.symmetric(vertical: 8),
                                     hintStyle: TextStyle(
                                       color: isDark ? Colors.grey[600] : Colors.grey[400],
                                     ),
+                                    suffixIcon: IconButton(
+                                      icon: const Icon(Icons.qr_code_scanner),
+                                      onPressed: () async {
+                                        final scannedAddress = await Navigator.push<String>(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => const QRScannerScreen(),
+                                          ),
+                                        );
+                                        
+                                        if (scannedAddress != null) {
+                                          setState(() {
+                                            _addressController.text = scannedAddress;
+                                            _validateAddress(scannedAddress);
+                                          });
+                                        }
+                                      },
+                                    ),
                                   ),
                                 ),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.book_outlined),
+                                onPressed: () async {
+                                  final address = await showModalBottomSheet<RecentAddress>(
+                                    context: context,
+                                    isScrollControlled: true,
+                                    backgroundColor: Colors.transparent,
+                                    builder: (context) => AddressBookModal(
+                                      selectedCoin: _selectedCoin.symbol,
+                                      selectedNetwork: _selectedNetwork.name,
+                                      addressService: getIt<AddressService>(),
+                                    ),
+                                  );
+
+                                  if (address != null) {
+                                    setState(() {
+                                      _addressController.text = address.address;
+                                      _validateAddress(address.address);
+                                    });
+                                  }
+                                },
                               ),
                               IconButton(
                                 onPressed: () async {
@@ -779,6 +839,9 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
                           if (!isAddressValid || !isAmountValid) {
                             return;
                           }
+
+                          // Save address to recent addresses
+                          await _saveAddress(_addressController.text);
 
                           // Show confirmation dialog
                           final confirmed = await _showConfirmationDialog();
