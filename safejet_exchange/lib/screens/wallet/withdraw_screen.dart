@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../../config/theme/colors.dart';
 import 'package:animate_do/animate_do.dart';
 import '../../widgets/custom_app_bar.dart';
+import 'package:provider/provider.dart';
+import '../../config/theme/theme_provider.dart';
 
 class WithdrawScreen extends StatelessWidget {
   const WithdrawScreen({super.key});
@@ -21,7 +23,8 @@ class WithdrawScreen extends StatelessWidget {
             // TODO: Show notifications
           },
           onThemeToggle: () {
-            // TODO: Handle theme toggle
+            final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+            themeProvider.toggleTheme();
           },
         ),
         body: DecoratedBox(
